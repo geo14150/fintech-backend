@@ -11,10 +11,10 @@ from plaid.model.transactions_get_request import TransactionsGetRequest
 
 load_dotenv()
 
-# 1. Σύνδεση στη Redis και την Ουρά
+
 r = redis.Redis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
 
-# 2. Ρύθμιση του Plaid Client
+
 PLAID_CLIENT_ID = "6a32723ac8748b000db3710f"
 PLAID_SECRET = "755ed9e8f72a02ce46f410ada464a4"
 
@@ -28,23 +28,23 @@ print("🏃‍♂️ [Worker] Ο αυτόνομος Background Worker ξεκίν
 
 while True:
     try:
-        # Ο Worker περιμένει σήμα από την ουρά "bank_sync_queue"
+        
         task = r.brpop("bank_sync_queue", timeout=5)
         
         if task:
             print("🔄 [Worker] Λήφθηκε σήμα συγχρονισμού! Έναρξη επικοινωνίας με Plaid Sandbox...")
             
-            # Παίρνουμε το αποθηκευμένο access_token από τη Redis
+            
             plaid_access_token = r.get("plaid_access_token")
             
             if not plaid_access_token:
                 print("❌ [Worker] Σφάλμα: Δεν βρέθηκε ενεργό access_token στη Redis. Παράκαμψη task.")
                 continue
                 
-            # Προσομοίωση Rate Limiting / Φόρτου δικτύου (3 δευτερόλεπτα)
+            
             time.sleep(3)
             
-            # Κλήση της Plaid
+            
             request = TransactionsGetRequest(
                 access_token=plaid_access_token,
                 start_date=datetime.date(2026, 1, 1),
@@ -71,13 +71,12 @@ while True:
                     "date": str(tx['date'])
                 })
                 
-            # Γράφουμε τα φρέσκα δεδομένα στη Redis Cache (διάρκεια 60 δευτερόλεπτα)
+            
             r.setex("user_expenses", 60, json.dumps({"transactions": clean_transactions}))
             print("💾 [Worker] Ο συγχρονισμός ολοκληρώθηκε! Η Redis Cache ενημερώθηκε επιτυχώς.")
             
     except (redis.exceptions.RedisError, TimeoutError, ConnectionError, OSError) as e:
-        # 🔥 Πιάνουμε ΟΛΑ τα πιθανά σφάλματα socket, timeouts και δικτύου της Python και της Redis
-        # Ο worker απλά θα προσπεράσει το σφάλμα, θα ξανασυνδεθεί αυτόματα και θα συνεχίσει να ακούει!
+        
         continue
     except Exception as e:
         print(f"❌ [Worker Error]: {str(e)}")

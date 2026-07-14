@@ -4,15 +4,15 @@ import { usePlaidLink } from 'react-plaid-link';
 function App() {
   const [expenses, setExpenses] = useState({ totalSpent: 0, transactions: [], live_incomes: [], message: '' });
   const [isSyncing, setIsSyncing] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(7); // default Ιούλιος 
-  const [selectedYear, setSelectedYear] = useState(2026); // default 2026
+  const [selectedMonth, setSelectedMonth] = useState(7); 
+  const [selectedYear, setSelectedYear] = useState(2026); 
   const [forecast, setForecast] = useState(null);
   const [annualSummary, setAnnualSummary] = useState({ income: 0, expenses: 0, net: 0 });
   
   const [linkToken, setLinkToken] = useState(null);
   const [isBankConnected, setIsBankConnected] = useState(false);
 
-  // 1. Φέρνουμε το Link Token από το FastAPI
+  
   useEffect(() => {
     const generateLinkToken = async () => {
       try {
@@ -56,13 +56,13 @@ function App() {
     }
   }, []);
 
-  // 2. Υπολογισμός Ετήσιων Δεδομένων (Αθροίζει και τους 12 μήνες του επιλεγμένου έτους)
+  
   const calculateAnnualSummary = useCallback(async (year) => {
     try {
       let totalYrIncome = 0;
       let totalYrExpenses = 0;
       
-      // Χτυπάμε το API και για τους 12 μήνες για να βρούμε το ετήσιο σύνολο
+      
       for (let m = 1; m <= 12; m++) {
         const res = await fetch(`http://localhost:8000/api/forecast/${m}?year=${year}`);
         const data = await res.json();
@@ -142,7 +142,6 @@ function App() {
         <span style={{ backgroundColor: '#10b981', color: '#fff', padding: '6px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.85rem' }}>✓ Connected via Plaid</span>
       </header>
 
-      {/* FINANCIAL HEALTH BANNER */}
       {forecast && (
         <div style={{ backgroundColor: forecast.financial_health.net_balance > 0 ? '#dcfce7' : '#fee2e2', border: `1px solid ${forecast.financial_health.net_balance > 0 ? '#bbf7d0' : '#fecaca'}`, borderRadius: '12px', padding: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -165,10 +164,10 @@ function App() {
         </div>
       )}
 
-      {/* TWO-COLUMN LAYOUT */}
+      
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}>
         
-        {/* ΑΡΙΣΤΕΡΟ COLUMN: LIVE BANK DATA */}
+       
         <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ margin: 0, fontSize: '1.3rem' }}>📥 Live Συναλλαγές Τράπεζας</h3>
@@ -216,12 +215,12 @@ function App() {
           </div>
         </div>
 
-        {/* ΔΕΞΙ COLUMN: PANDAS PREDICTIVE ANALYTICS */}
+        
         <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ margin: 0, fontSize: '1.3rem' }}>📊 Έξυπνη Πρόβλεψη (Pandas Engine)</h3>
             
-            {/* ΦΙΛΤΡΑ ΜΗΝΑ & ΕΤΟΥΣ */}
+            
             <div style={{ display: 'flex', gap: '10px' }}>
               <select value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}>
                 <option value={1}>Ιανουάριος</option>
